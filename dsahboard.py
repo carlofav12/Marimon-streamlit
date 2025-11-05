@@ -141,7 +141,7 @@ if not df.empty:
     col_btn1, col_btn2, col_btn3 = st.columns(3)
     
     with col_btn1:
-        if st.button("📊 Gráfico De Líneas", key="btn_barras", use_container_width=True):
+        if st.button("📊 Gráfico De Barras", key="btn_barras", use_container_width=True):
             st.session_state.vista_actual = "barras"
     
     with col_btn2:
@@ -154,45 +154,36 @@ if not df.empty:
 
     st.markdown("---")
 
-    # VISTA DE GRÁFICO DE LÍNEAS
+    # VISTA DE GRÁFICO DE BARRAS
     if st.session_state.vista_actual == "barras":
-        st.markdown("## 📊 EVOLUCIÓN DE VENTAS - ACUMULADO MES A MES")
+        st.markdown("## 📊 VENTAS POR MES")
         
-        # Crear gráfico de líneas acumuladas por mes
-        df_sorted = df.sort_values('fecha_emision')
-        df_sorted['mes'] = df_sorted['fecha_emision'].dt.to_period('M')
-        ventas_mes = df_sorted.groupby('mes')['total_venta'].sum().reset_index()
-        ventas_mes['ventas_acumuladas'] = ventas_mes['total_venta'].cumsum()
-        ventas_mes['mes_str'] = ventas_mes['mes'].astype(str)
+        # Crear gráfico de barras
+        df['mes'] = df['fecha_emision'].dt.strftime('%b')
+        ventas_mes = df.groupby('mes')['total_venta'].sum().reset_index()
         
-        fig_line = go.Figure()
-        
-        # Línea de ventas acumuladas
-        fig_line.add_trace(go.Scatter(
-            x=ventas_mes['mes_str'],
-            y=ventas_mes['ventas_acumuladas'],
-            mode='lines+markers+text',
-            name='Ventas Acumuladas',
-            text=[f"S/ {v:,.0f}" for v in ventas_mes['ventas_acumuladas']],
-            textposition="top center",
-            line=dict(color='#DC143C', width=3),
-            marker=dict(size=10, color='#DC143C'),
-            hovertemplate='<b>%{x}</b><br>Ventas Acumuladas: S/ %{y:,.0f}<extra></extra>'
+        fig_bar = go.Figure()
+        fig_bar.add_trace(go.Bar(
+            x=ventas_mes['mes'],
+            y=ventas_mes['total_venta'],
+            text=[f"S/ {v:,.0f}" for v in ventas_mes['total_venta']],
+            textposition='outside',
+            marker=dict(color='#DC143C'),
+            hovertemplate='<b>%{x}</b><br>Ventas: S/ %{y:,.0f}<extra></extra>'
         ))
         
-        fig_line.update_layout(
+        fig_bar.update_layout(
             height=400,
-            showlegend=True,
-            xaxis_title="Mes",
-            yaxis_title="Ventas Acumuladas (S/)",
+            showlegend=False,
+            xaxis_title="",
+            yaxis_title="Ventas (S/)",
             plot_bgcolor='white',
             paper_bgcolor='white',
             margin=dict(t=20, b=40, l=40, r=20),
-            font=dict(size=12),
-            hovermode='x unified'
+            font=dict(size=12)
         )
         
-        st.plotly_chart(fig_line, use_container_width=True)
+        st.plotly_chart(fig_bar, use_container_width=True)
         
         # Gráfico de dona de ingresos por trimestre
         st.markdown("### 📊 INGRESOS POR TRIMESTRE")
