@@ -115,23 +115,25 @@ if not df.empty:
 
     # Botones de navegación entre vistas
     st.markdown("### Selecciona Vista:")
-    col_btn1, col_btn2, col_btn3 = st.columns(3)
     
-    with col_btn1:
-        if st.button("📊 Gráfico De Barras", key="btn_barras"):
-            st.session_state.vista_actual = "barras"
-    
-    with col_btn2:
-        if st.button("🍩 Gráfico Circular", key="btn_circular"):
-            st.session_state.vista_actual = "circular"
-    
-    with col_btn3:
-        if st.button("📋 Tabla Dinámica", key="btn_tabla"):
-            st.session_state.vista_actual = "tabla"
-
     # Inicializar vista por defecto
     if 'vista_actual' not in st.session_state:
         st.session_state.vista_actual = "barras"
+    
+    # Crear 3 columnas para botones horizontales
+    col_btn1, col_btn2, col_btn3 = st.columns(3)
+    
+    with col_btn1:
+        if st.button("📊 Gráfico De Barras", key="btn_barras", use_container_width=True):
+            st.session_state.vista_actual = "barras"
+    
+    with col_btn2:
+        if st.button("🍩 Gráfico Circular", key="btn_circular", use_container_width=True):
+            st.session_state.vista_actual = "circular"
+    
+    with col_btn3:
+        if st.button("📋 Tabla Dinámica", key="btn_tabla", use_container_width=True):
+            st.session_state.vista_actual = "tabla"
 
     st.markdown("---")
 
