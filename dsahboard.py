@@ -280,5 +280,32 @@ if not df.empty:
         
         st.markdown(f"**Total de registros:** {len(tabla)}")
 
+    # Botón para ver dashboard completo en Power BI
+    st.markdown("---")
+    st.markdown("### 📊 ¿Necesitas más información?")
+    
+    powerbi_url = "https://app.powerbi.com/view?r=eyJrIjoiNDYxODJhZDYtMTBjZC00ZjhiLTgzMWQtMjhlMzIwODZjNDY1IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9"
+    
+    st.markdown(f"""
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="{powerbi_url}" target="_blank" style="text-decoration: none;">
+            <button style="
+                background-color: #DC143C;
+                color: white;
+                padding: 15px 40px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                border-radius: 25px;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                transition: all 0.3s;
+            ">
+                🔍 Ver Dashboard Completo en Power BI
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+
 else:
     st.warning("No hay datos para mostrar")
