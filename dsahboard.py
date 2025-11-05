@@ -51,16 +51,6 @@ st.markdown("<h1 style='color:#DC143C'>📊 Reporte de Ventas - Marimon</h1>", u
 
 # FILTROS
 if not df.empty:
-    categoria_opts = sorted(df['categoria_nombre'].dropna().unique())
-    producto_opts = sorted(df['nombre'].dropna().unique())
-    categorias_sel = st.sidebar.multiselect("Categoría", categoria_opts, default=categoria_opts)
-    productos_sel = st.sidebar.multiselect("Producto", producto_opts, default=None)
-
-    # FILTRADO
-    df = df[df['categoria_nombre'].isin(categorias_sel)]
-    if productos_sel:
-        df = df[df['nombre'].isin(productos_sel)]
-
     # CSS personalizado para botones estilo móvil
     st.markdown("""
     <style>
@@ -69,50 +59,59 @@ if not df.empty:
         background-color: white;
         color: #DC143C;
         border: 2px solid #DC143C;
-        border-radius: 20px;
-        padding: 10px 20px;
+        border-radius: 25px;
+        padding: 12px 20px;
         font-weight: bold;
         margin: 5px 0;
+        font-size: 14px;
     }
     div.stButton > button:hover {
         background-color: #DC143C;
         color: white;
     }
-    .metric-card {
+    /* Ocultar el expand del sidebar en móvil */
+    section[data-testid="stSidebar"] {
         background-color: #f8f9fa;
-        padding: 15px;
+    }
+    /* Estilo para selectbox */
+    div[data-baseweb="select"] > div {
         border-radius: 10px;
-        border-left: 5px solid #DC143C;
-        margin: 10px 0;
+        border-color: #DC143C;
     }
     </style>
     """, unsafe_allow_html=True)
+
+    # Filtros en el sidebar con búsqueda
+    st.sidebar.markdown("### 🔍 Filtros")
+    
+    categoria_opts = ['Todas'] + sorted(df['categoria_nombre'].dropna().unique().tolist())
+    categoria_sel = st.sidebar.selectbox(
+        "Categoría",
+        options=categoria_opts,
+        index=0
+    )
+    
+    # Filtro de producto con búsqueda (selectbox permite escribir)
+    producto_opts = ['Todos'] + sorted(df['nombre'].dropna().unique().tolist())
+    producto_sel = st.sidebar.selectbox(
+        "Buscar Producto",
+        options=producto_opts,
+        index=0,
+        help="Escribe para buscar un producto específico"
+    )
+
+    # Aplicar filtros
+    if categoria_sel != 'Todas':
+        df = df[df['categoria_nombre'] == categoria_sel]
+    
+    if producto_sel != 'Todos':
+        df = df[df['nombre'] == producto_sel]
 
     # Preparar datos
     df['quincena'] = df['fecha_emision'].apply(lambda x: f"{x.strftime('%b %Y')} Q1" if x.day <=15 else f"{x.strftime('%b %Y')} Q2")
     ventas_q = df.groupby('quincena').agg({'total_venta': 'sum'}).reset_index()
     ventas_cat = df.groupby('categoria_nombre')['total_venta'].sum().reset_index()
     ventas_cat['Porcentaje'] = (ventas_cat['total_venta']/ventas_cat['total_venta'].sum()*100).round(2)
-
-    # Métricas superiores
-    col1, col2 = st.columns(2)
-    with col1:
-        total_ventas = df['total_venta'].sum()
-        st.markdown(f"""
-        <div class="metric-card">
-            <h4 style='margin:0; color:#666'>VENTAS TOTAL</h4>
-            <h2 style='margin:5px 0; color:#DC143C'>S/ {total_ventas:,.0f}</h2>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        total_productos = df['cantidad'].sum()
-        st.markdown(f"""
-        <div class="metric-card">
-            <h4 style='margin:0; color:#666'>PRODUCTOS VENDIDOS</h4>
-            <h2 style='margin:5px 0; color:#DC143C'>{total_productos:,.0f}</h2>
-        </div>
-        """, unsafe_allow_html=True)
 
     # Botones de navegación entre vistas
     st.markdown("### Selecciona Vista:")
